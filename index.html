@@ -259,7 +259,7 @@
 				}
 			}
 			var listUrl = $('#ListUrl').val()
-			if (listValue.indexOf('http://') === 0)
+			if (listValue.indexOf('http://') === 0 || listValue.indexOf('https://') === 0)
 				r = listValue
 			else if (listValue.indexOf('/') !== 0) {
 				pre.val(listUrl)
