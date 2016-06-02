@@ -123,10 +123,8 @@
 				} else
 					for (var r in result)
 						if (result[r].length < 50) {
-							regex.compile(result[r], 'g')
 							src = src.replace(regex, '')
 						} else {
-							regex.compile(result[r], 'g')
 							var index = src.indexOf(result[r])
 							src = src.substring(0, index) + src.substring(index + result[r].length, src.length - 1)
 						}
