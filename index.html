@@ -122,7 +122,7 @@
 					regex.compile(regStr, 'g')
 					result = src.match(regex)
 				} catch (e) {
-					regJQ.children('span').html('正则表达式似乎不太对: ' + e.message).show()
+					regJQ.children('span').html('正则表达式似乎不正确: ' + e.message).show()
 					break
 				}
 				if (regJQ.children('select').val() == '1') {// 0-去除,1-保留
