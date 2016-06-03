@@ -45,17 +45,18 @@
 			<div>
 				<input type="button" value="+" onclick="addRegex();" />
 				<input type="button" value="筛选" onclick="ListFilter();" />
-				<div id="ListTip" style="display:none">正在处理...</div>
-				<div id="ListRegexs">
+				<span id="ListTip" style="display:none">正在处理...</span>
+				<form id="ListRegexs">
 					<div class="regex">
-						<select>
+						<select name="slt0">
 							<option value="1">保留</option>
 							<option value="0">去除</option>
 						</select>
-						<input type="text" />
+						<input type="text" name="txt0" onchange="hideMsg(this);" />
 						<a href="#" onclick="return delRegex(this);" style="color:darkred;font-size:12px;">删除</a>
+						<span style="color:red;display:none"></span>
 					</div>
-				</div>
+				</form>
 			</div>
 			<div>
 				<input type="hidden" id="ListValue" />
@@ -78,16 +79,17 @@
 				<input type="button" value="筛选" onclick="ContentFilter();" />
 				<input type="button" value="筛选全部内容" onclick="LoadAll();" />
 				<span id="ContentTip" style="display:none">正在处理...</span>
-				<div id="ContentRegexs">
+				<form id="ContentRegexs">
 					<div class="regex">
-						<select>
+						<select name="slt0">
 							<option value="1">保留</option>
 							<option value="0">去除</option>
 						</select>
-						<input type="text" />
+						<input type="text" name="txt0" onchange="hideMsg(this);" />
 						<a href="#" onclick="return delRegex(this);" style="color:darkred;font-size:12px;">删除</a>
+						<span style="color:red;display:none"></span>
 					</div>
-				</div>
+				</form>
 			</div>
 			<div>
 				<input type="hidden" id="ContentValue" />
@@ -100,8 +102,9 @@
 					<option value="1">保留</option>
 					<option value="0">去除</option>
 				</select>
-				<input type="text" />
+				<input type="text" name="txt0" onchange="hideMsg(this);" />
 				<a href="#" onclick="return delRegex(this);" style="color:darkred;font-size:12px;">删除</a>
+				<span style="color:red;display:none"></span>
 			</div>
 		</div>
 	</div>
@@ -115,8 +118,13 @@
                     regStr = regJQ.children('input').val(),
                     result, r1 = ''
 				if (regStr.length < 1) continue
-				regex.compile(regStr, 'g')
-				result = src.match(regex)
+				try {
+					regex.compile(regStr, 'g')
+					result = src.match(regex)
+				} catch (e) {
+					regJQ.children('span').html('正则表达式似乎不太对: ' + e.message).show()
+					break
+				}
 				if (regJQ.children('select').val() == '1') {// 0-去除,1-保留
 					for (var r in result) r1 += result[r] + '\r\n'
 					src = r1
@@ -225,12 +233,20 @@
 			})
 		})
 		//UI
+		function hideMsg(o) {
+			$(o).siblings('span').hide();
+		}
 		function delRegex(o) {
-			$(o.parentNode).remove();
+			o = $(o.parentNode)
+			var gp = o.parent();
+			o.remove();
+			childrenChange(gp);
 			return false;
 		}
 		function addRegex() {
-			$(event.srcElement).siblings('div').append($('#template').children().clone());
+			var div = $(event.srcElement).siblings('form')
+			div.append($('#template').children().clone());
+			childrenChange(div);
 		}
 		function checkUrl(obj) {
 			$(obj).siblings(':button').show();
@@ -270,13 +286,28 @@
 			$('#ContentUrl').val(r)
 			return r
 		}
+
+		function childrenChange(o) {
+			var children = o.children()
+			for (var i = 0; i < children.length; i++) {
+				var rgx = $(children[i])
+				rgx.find('select').attr('name', 'slt' + i)
+				rgx.find(':text').attr('name', 'txt' + i)
+			}
+		}
 	</script>
 	<script>
 		function saveReg() {
-
+			var cfg = {};
+			cfg['listUrl'] = $('#ListUrl').val()
+			cfg['list'] = $('#ListRegexs').serializeArray();
+			cfg['contentUrl'] = $('#ContentUrl').val()
+			cfg['content'] = $('#ContentRegexs').serializeArray();
+			document.cookie = 'config=' + escape(JSON.stringify(cfg)) + ';expires=' + Date.now();
 		}
 
 		function readReg() {
+			alert('r');
 
 		}
 	</script>
